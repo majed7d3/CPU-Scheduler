@@ -1,14 +1,14 @@
 public class Schedulers {
     
-    public void First_Come_First_Serve(){
+    public void First_Come_First_Serve(queue ready){
 
     }
 
-    public void Round_Robin(){
+    public void Round_Robin(queue ready){
 
     }
 
-    public void Shortest_Job_First(){
+    public void Shortest_Job_First(queue ready){
         
     }
 
