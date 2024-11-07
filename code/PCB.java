@@ -42,7 +42,15 @@ public class PCB {
     public int getWait() {
         return wait;
     }
+    
+public void setTurnaround(int turnaround) {
+		this.turnaround = turnaround;
+	}
 
+	public void setWait(int wait) {
+		this.wait = wait;
+	}
+    
     public void theRemain(int burstTook) {
         remain = remain - burstTook;
     }
