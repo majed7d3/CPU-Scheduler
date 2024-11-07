@@ -42,6 +42,10 @@ public class PCB {
     public int getWait() {
         return wait;
     }
+	
+	public void setState(state state) {
+		this.state = state;
+	}
     
 public void setTurnaround(int turnaround) {
 		this.turnaround = turnaround;
