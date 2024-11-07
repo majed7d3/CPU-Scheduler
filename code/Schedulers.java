@@ -1,5 +1,5 @@
 public class Schedulers {
-    
+    private queue finish;
     public void First_Come_First_Serve(queue ready){
 int currenttime=0;
     	 node N1 = new node();
