@@ -21,7 +21,55 @@ public class Schedulers {
     }
 
     public void Round_Robin(queue ready){
+        queue waiting = new queue();
+        int time = 0;
+        while(ready.length() > 0){
+            PCB job = ready.serve();
+            int remain = job.getRemain();
+            
+            if(remain <= 8){
+                job.theRemain(remain);
+                time = time + remain;
+            }
+            else{
+                job.theRemain(8);
+                time = time + 8;
+            }
 
+            if(job.getRemain() != 0){
+                waiting.enqueue(job);
+            }
+            else{
+                job.setState(state.finish);
+                job.setTurnaround(time);
+                job.setWait(time - job.getBurst());
+                finish.enqueue(job);
+            }
+        }
+
+        while(waiting.length() > 0){
+            PCB job = ready.serve();
+            int remain = job.getRemain();
+            
+            if(remain <= 8){
+                job.theRemain(remain);
+                time = time + remain;
+            }
+            else{
+                job.theRemain(8);
+                time = time + 8;
+            }
+
+            if(job.getRemain() != 0){
+                waiting.enqueue(job);
+            }
+            else{
+                job.setState(state.finish);
+                job.setTurnaround(time);
+                job.setWait(time - job.getBurst());
+                finish.enqueue(job);
+            }
+        }
     }
 
     public void Shortest_Job_First(queue ready){
