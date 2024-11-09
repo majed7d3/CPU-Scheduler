@@ -2,22 +2,17 @@ public class Schedulers {
     private queue finish;
     public void First_Come_First_Serve(queue ready){
          int currenttime=0;
-    	 node N1 = new node();
     	queue readyQueue=ready;
-        
-    	for(int i=0;i<readyQueue.length();i++){
-    	    
-    		N1.process.setWait(currenttime);
+    	
+    	 while(readyQueue.length()>0){
+    		 PCB job= readyQueue.serve();
+    		 job.setState(state.finish);
+    		 job.setWait(currenttime);
+    		 job.setTurnaround(currenttime + job.getBurst());
+    		 currenttime+= job.getBurst();
+    		 finish.enqueue(job);
+    	 }
 
-    	   N1.process.setTurnaround(currenttime + N1.process.getBurst());
-
-    	    currenttime+=N1.process.getBurst();
-    	   
-    	N1.process.setState( N1.process.getState().finish);
-
-            finish.enqueue(readyQueue.serve());
-
-    	}// for now 
     }
 
     public void Round_Robin(queue ready){
