@@ -11,7 +11,7 @@ public class PCB {
         this.id = id;
         this.burst = remain = burst;
         this.memory = memory;
-        turnaround = burst;
+        turnaround = 0;
         state = state.waiting;
     }
 
@@ -47,7 +47,7 @@ public class PCB {
 		this.state = state;
 	}
     
-public void setTurnaround(int turnaround) {
+	public void setTurnaround(int turnaround) {
 		this.turnaround = turnaround;
 	}
 
@@ -55,7 +55,7 @@ public void setTurnaround(int turnaround) {
 		this.wait = wait;
 	}
     
-    public void theRemain(int burstTook) {
+        public void theRemain(int burstTook) {
         remain = remain - burstTook;
     }
 }
