@@ -16,14 +16,14 @@ public class PQueue {
     public void enqueue(PCB job, int burstTook) { 
 		node tmp = new node(job);
 		job.theRemain(burstTook);
-		if((size == 0) || (job.getRemain() > head.process.getRemain())) {
+		if((size == 0) || (job.getRemain() < head.process.getRemain())) {
 			tmp.next = head;
 			head = tmp;
 		}
 		else {
 			node p = head;
 			node q = null;
-			while((p != null) && (job.getRemain() <= p.process.getRemain())) {
+			while((p != null) && (job.getRemain() >= p.process.getRemain())) {
 				q = p;
 				p = p.next;
 			}
