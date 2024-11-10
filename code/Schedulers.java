@@ -68,7 +68,34 @@ public class Schedulers {
     }
 
     public void Shortest_Job_First(queue ready){
-        
+        SchedulerResult result = new SchedulerResult(); // Create result handler for SJF
+        int currentTime = 0; // Tracks the current time in the scheduling simulation
+        List<PCB> completedProcesses = new ArrayList<>(); // List to store completed processes
+
+    
+        while (ready.length() > 0) {    // Continue until all processes in the ready queue have been served
+            
+            PCB currentProcess = ready.serve();    // Serve the process with the shortest remaining burst time
+            
+            int startTime = currentTime;    // Record the start time of this process
+            
+            currentProcess.setWait(currentTime);     // Calculate and set waiting time for this process
+            
+            currentTime += currentProcess.getBurst();    // Simulate the process execution by adding its remaining time to current time
+            
+            int endTime = currentTime;     // Record the end time of this process
+
+            currentProcess.setTurnaround(endTime);     // Set turnaround time for this process
+            
+            currentProcess.setState(state.finish);     // Process has now completed
+            
+            result.addProcessExecution(currentProcess.getId(), startTime, endTime, currentProcess.getWait(), currentProcess.getTurnaround());    // Record the execution details in SchedulerResult
+
+        }
+    
+        // Display results for SJF
+        result.displayResults();
+    }
     }
 
 }
