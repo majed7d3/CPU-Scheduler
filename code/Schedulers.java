@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Schedulers {
     private queue finish;
     public void First_Come_First_Serve(queue ready){
