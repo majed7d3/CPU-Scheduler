@@ -8,18 +8,21 @@ public class fileReader implements Runnable{
     private String fileName;
     private PQueue jabPQueue;
     private queue jabQueue;
+    private systemcall syscall;
 
 
-    public fileReader(PQueue jabPQueue,String fileName){
+    public fileReader(PQueue jabPQueue,String fileName, systemcall syscall){
         flag = false;
         this.fileName = fileName;
         this.jabPQueue = jabPQueue;
+        this.syscall = syscall;
     }
 
-    public fileReader(queue jabQueue,String fileName){
+    public fileReader(queue jabQueue,String fileName, systemcall syscall){
         flag = true;
         this.fileName = fileName;
         this.jabQueue = jabQueue;
+        this.syscall = syscall;
     }
 
 
@@ -37,11 +40,10 @@ public class fileReader implements Runnable{
                 int id = Integer.parseInt(dataJab[0]);
                 int burst = Integer.parseInt(dataJab[1]);
                 int memory = Integer.parseInt(dataJab[2]);
-                PCB jab = new PCB(id, burst, memory);
                     if(flag)
-                        jabQueue.enqueue(jab);
+                        jabQueue.enqueue(syscall.createProcess(id, burst, memory));
                     else
-                        jabPQueue.enqueue(jab, 0);
+                        jabPQueue.enqueue(syscall.createProcess(id, burst, memory), 0);
             }
         } catch (IOException e) {
             System.out.println("no file found.");
