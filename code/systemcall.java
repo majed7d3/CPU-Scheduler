@@ -113,6 +113,13 @@ public class systemcall  {
         os.setWait(process, wait);
         os.switchMod();
 	}
+	
+    //calculate the remain time for the process
+    public void theRemain(PCB process, int burstTook){
+		os.switchMod();
+        os.remain(process, burstTook);
+        os.switchMod();
+	}
 
     //returns the amount of memory that is used
     public int memoryAllocate(){
