@@ -11,25 +11,23 @@ public class queue {
         return size;
     }
 
-    public void enqueue(PCB e) {
+    public void enqueue(PCB job) {
 		if(tail == null){
-			head = tail = new node(e);
+			head = tail = new node(job);
 		}
 		else {
-			tail.next = new node(e);
+			tail.next = new node(job);
 			tail = tail.next;
 		}
 		size++;
 	}
 
     public PCB serve() {
-		PCB x = head.process;
+		PCB job = head.process;
 		head = head.next;
 		size--;
 		if(size == 0)
 			tail = null;
-		return x;
+		return job;
 	}
-
-
 }
