@@ -15,7 +15,6 @@ public class operatingsystem  {
         PCB process = null;
         if(!bitMod){
             process = new PCB(id, burst, memory);
-            this.memory = this.memory + memory;
         }
         return process;
     }
@@ -23,7 +22,6 @@ public class operatingsystem  {
     public PCB Terminate(PCB process){
         if(!bitMod){
             process.setState(state.finish);
-            this.memory = this.memory - memory;
         }
         return process;
     }
