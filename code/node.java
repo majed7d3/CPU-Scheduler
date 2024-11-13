@@ -8,7 +8,7 @@ public class node {
     }
 
     public node(PCB process) {
-        this.process = new PCB(process.getId(), process.getBurst(), process.getMemory());
+        this.process = process;
         next = null;
     }
 
@@ -25,7 +25,7 @@ public class node {
     }
 
     public void setProcess(PCB process) {
-        this.process = new PCB(process.getId(), process.getBurst(), process.getMemory());
+        this.process = process;
     }
 
 }
