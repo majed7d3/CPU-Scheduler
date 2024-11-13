@@ -111,6 +111,12 @@ public class operatingsystem  {
         }
 	}
 
+    public void remain(PCB process, int burstTook) {
+		if(!bitMod){
+            process.theRemain(burstTook);
+        }
+	}
+
     public int memoryAllocate() {
         if(!bitMod)
             return 1024 - memory;
