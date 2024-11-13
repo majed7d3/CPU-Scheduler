@@ -43,7 +43,7 @@ public class fileReader implements Runnable{
                     if(flag)
                         jabQueue.enqueue(syscall.createProcess(id, burst, memory));
                     else
-                        jabPQueue.enqueue(syscall.createProcess(id, burst, memory), 0);
+                        jabPQueue.enqueue(syscall.createProcess(id, burst, memory), 0, syscall);
             }
         } catch (IOException e) {
             System.out.println("no file found.");
