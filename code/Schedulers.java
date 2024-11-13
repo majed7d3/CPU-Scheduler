@@ -53,7 +53,7 @@ public class Schedulers {
         }
 
         while(waiting.length() > 0){
-            PCB job = ready.serve();
+            PCB job = waiting.serve();
             int remain = syscall.getRemain(job);
             
             if(remain <= 8){
