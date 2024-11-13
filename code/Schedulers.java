@@ -3,6 +3,13 @@ import java.util.List;
 
 public class Schedulers {
     private queue finish;
+    private systemcall syscall;
+
+    public Schedulers(queue finish, systemcall syscall){
+        this.finish = finish;
+        this.syscall = syscall;
+    }
+    
     public void First_Come_First_Serve(queue ready){
          int currenttime=0;
     	queue readyQueue=ready;
@@ -23,48 +30,48 @@ public class Schedulers {
         int time = 0;
         while(ready.length() > 0){
             PCB job = ready.serve();
-            int remain = job.getRemain();
+            int remain = syscall.getRemain(job);
             
             if(remain <= 8){
-                job.theRemain(remain);
+                syscall.theRemain(job, remain);
                 time = time + remain;
             }
             else{
-                job.theRemain(8);
+                syscall.theRemain(job, 8);
                 time = time + 8;
             }
 
-            if(job.getRemain() != 0){
+            if(syscall.getRemain(job) != 0){
                 waiting.enqueue(job);
             }
             else{
-                job.setState(state.finish);
-                job.setTurnaround(time);
-                job.setWait(time - job.getBurst());
+                syscall.TerminateProcess(job);
+                syscall.setTurnaround(job, time);
+                syscall.setWait(job, time - syscall.getBurst(job));
                 finish.enqueue(job);
             }
         }
 
         while(waiting.length() > 0){
             PCB job = ready.serve();
-            int remain = job.getRemain();
+            int remain = syscall.getRemain(job);
             
             if(remain <= 8){
-                job.theRemain(remain);
+                syscall.theRemain(job, remain);
                 time = time + remain;
             }
             else{
-                job.theRemain(8);
+                syscall.theRemain(job, 8);
                 time = time + 8;
             }
 
-            if(job.getRemain() != 0){
+            if(syscall.getRemain(job) != 0){
                 waiting.enqueue(job);
             }
             else{
-                job.setState(state.finish);
-                job.setTurnaround(time);
-                job.setWait(time - job.getBurst());
+                syscall.TerminateProcess(job);
+                syscall.setTurnaround(job, time);
+                syscall.setWait(job, time - syscall.getBurst(job));
                 finish.enqueue(job);
             }
         }
