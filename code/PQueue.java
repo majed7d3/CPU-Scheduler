@@ -13,17 +13,17 @@ public class PQueue {
     }
 
 	//burstTook is useed for calculate the remaining time, remaining = burst_time - burstTook
-    public void enqueue(PCB job, int burstTook) { 
+    public void enqueue(PCB job, int burstTook, systemcall syscall) { 
 		node tmp = new node(job);
-		job.theRemain(burstTook);
-		if((size == 0) || (job.getRemain() < head.process.getRemain())) {
+		syscall.theRemain(job, burstTook);
+		if((size == 0) || (syscall.getRemain(job) > syscall.getRemain(head.process))) {
 			tmp.next = head;
 			head = tmp;
 		}
 		else {
 			node p = head;
 			node q = null;
-			while((p != null) && (job.getRemain() >= p.process.getRemain())) {
+			while((p != null) && (syscall.getRemain(job) <= syscall.getRemain(p.process))) {
 				q = p;
 				p = p.next;
 			}
@@ -35,8 +35,7 @@ public class PQueue {
 
 
     public PCB serve(){
-		node node = head;
-		PCB job = new PCB(node.process.getId(), node.process.getBurst(), node.process.getMemory());
+		PCB job = head.process;
 		head = head.next;
 		size--;
 		return job;
