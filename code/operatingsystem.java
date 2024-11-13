@@ -33,6 +33,7 @@ public class operatingsystem  {
             this.memory = this.memory - memory;
         if(this.memory >= 0)
             return true;
+	this.memory = this.memory + memory;
         return false;
     }
 
@@ -41,6 +42,7 @@ public class operatingsystem  {
             this.memory = this.memory + memory;
         if(this.memory <= 1024)
             return true;
+	this.memory = this.memory - memory;
         return false;
     }
 
