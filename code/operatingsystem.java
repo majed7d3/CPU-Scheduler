@@ -1,16 +1,24 @@
 public class operatingsystem  {
     private boolean bitMod; //false is kernel mode true is user mode
-    private int memory;
+    private int memory; //the memory that is allowed in MB (1024MB)
 
+    //Constructor
     public operatingsystem(){
         memory = 1024;
         bitMod = true;
     }
 
-    public void switchMod(){
-        bitMod = !bitMod;
+    //to switch to the kernel mode
+    public void switchToKernelMode(){
+        bitMod = false;
     }
 
+    //to switch to the user mode
+    public void switchToUserMode(){
+        bitMod = true;
+    }
+
+    //to create a new process, if it falled it will return a null process
     public PCB create(int id, int burst, int memory){
         PCB process = null;
         if(!bitMod){
@@ -19,31 +27,34 @@ public class operatingsystem  {
         return process;
     }
 
-    public PCB Terminate(PCB process){
+    //to Terminate a process, if it falled it will not Terminate the process 
+    public void Terminate(PCB process){
         if(!bitMod){
             process.setState(state.finish);
         }
-        return process;
     }
 
+    //to allocate an mount of memory, return true if successful ,false otherwise
     public boolean allocate(int memory){
         if(!bitMod)
             this.memory = this.memory - memory;
         if(this.memory >= 0)
             return true;
-	this.memory = this.memory + memory;
+        this.memory = this.memory + memory;
         return false;
     }
 
+    //to deallocate an mount of memory, return true if successful ,false otherwise
     public boolean deallocate(int memory){
         if(!bitMod)
             this.memory = this.memory + memory;
         if(this.memory <= 1024)
             return true;
-	this.memory = this.memory - memory;
+        this.memory = this.memory - memory;
         return false;
     }
 
+    //return the id of a process, -1 otherwise
     public int getId(PCB process){
         if(!bitMod){
             return process.getId();
@@ -51,6 +62,7 @@ public class operatingsystem  {
         return -1;
     }
 
+    //return the state of a process, null otherwise
     public state getState(PCB process){
         if(!bitMod){
             return process.getState();
@@ -58,6 +70,7 @@ public class operatingsystem  {
         return null;
     }
 
+    //return the burst time of a process, -1 otherwise
     public int getBurst(PCB process){
         if(!bitMod){
             return process.getBurst();
@@ -65,6 +78,7 @@ public class operatingsystem  {
         return -1;
     }
 
+    //return the remaining time of a process, -1 otherwise
     public int getRemain(PCB process){
         if(!bitMod){
             return process.getRemain();
@@ -72,6 +86,7 @@ public class operatingsystem  {
         return -1;
     }
 
+    //return the memory of a process, -1 otherwise
     public int getMemory(PCB process){
         if(!bitMod){
             return process.getMemory();
@@ -79,6 +94,7 @@ public class operatingsystem  {
         return -1;
     }
 
+    //return the turnaround time of a process, -1 otherwise
     public int getTurnaround(PCB process){
         if(!bitMod){
             return process.getTurnaround();
@@ -86,6 +102,7 @@ public class operatingsystem  {
         return -1;
     }
 
+    //return the Waiting time of a process, -1 otherwise
     public int getWait(PCB process){
         if(!bitMod){
             return process.getWait();
@@ -93,30 +110,35 @@ public class operatingsystem  {
         return -1;
     }
 
+    //to set the state of a process
     public void setState(PCB process, state state) {
 		if(!bitMod){
             process.setState(state);
         }
 	}
 
+    //to set the turnaround time of a process
     public void setTurnaround(PCB process, int turnaround) {
 		if(!bitMod){
             process.setTurnaround(turnaround);
         }
 	}
 
+    //to set the Waiting time of a process
 	public void setWait(PCB process, int wait) {
 		if(!bitMod){
             process.setWait(wait);
         }
 	}
 
+    //to set the remaining time of a process
     public void remain(PCB process, int burstTook) {
 		if(!bitMod){
             process.theRemain(burstTook);
         }
 	}
 
+    //return the amount of allocate memory, -1 otherwise
     public int memoryAllocate() {
         if(!bitMod)
             return 1024 - memory;
