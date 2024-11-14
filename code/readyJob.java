@@ -36,10 +36,21 @@ public class readyJob implements Runnable{
             while(readerThread.isAlive() || jobQueue.length() > 0 || (jobQueue.length() == 0 && job != null)){
                 //to wait for the reader thread to start
                 while(jobQueue.length() == 0 && readerThread.isAlive()); 
+                
                 //check if the job queue not empty and there is no old job
                 if( jobQueue.length() != 0 && job == null){
                     job = jobQueue.serve();
                 }
+
+                //to check if the job is bigger then the memory
+                if(syscall.getMemory(job) > 1024){
+                    //set it as canceled
+                    syscall.setState(job, state.canceled);
+                    //add it to the canceled queue
+                    cancelQueue.enqueue(job);
+                    job = null;
+                }
+                
                 //check if there is a new/old job and there is space in memory for it
                 if(job != null && syscall.allocateMemory(syscall.getMemory(job))){
                     syscall.setState(job, state.ready);
@@ -61,6 +72,16 @@ public class readyJob implements Runnable{
                 if( priorityJobQueue.length() != 0 && job == null){
                     job = priorityJobQueue.serve();
                 }
+
+                //to check if the job is bigger then the memory
+                if(syscall.getMemory(job) > 1024){
+                    //set it as canceled
+                    syscall.setState(job, state.canceled);
+                    //add it to the canceled queue
+                    cancelQueue.enqueue(job);
+                    job = null;
+                }
+
                 //check if there is a new/old job and there is space in memory for it
                 if(job != null && syscall.allocateMemory(syscall.getMemory(job))){
                     syscall.setState(job, state.ready);
