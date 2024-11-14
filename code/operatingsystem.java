@@ -137,12 +137,4 @@ public class operatingsystem  {
             process.theRemain(burstTook);
         }
 	}
-
-    //return the amount of allocate memory, -1 otherwise
-    public int memoryAllocate() {
-        if(!bitMod)
-            return 1024 - memory;
-        return -1;
-    }
-
 }
