@@ -14,6 +14,7 @@ public class appRun {
         queue jobQueue = new queue();
         queue readyQueue = new queue();
         queue finishQueue = new queue();
+        queue cancelQueue = new queue();
         operatingsystem os = new operatingsystem();
         systemcall syscall = new systemcall(os);
         
@@ -29,7 +30,7 @@ public class appRun {
             //starting the reader thread
             jobThread.start();
             //initializing the ready thread
-            ready = new readyJob(priorityJobQueue, readyQueue, syscall, jobThread);
+            ready = new readyJob(priorityJobQueue, readyQueue, cancelQueue, syscall, jobThread);
         }
         else{
             //initializing the reader thread
@@ -38,7 +39,7 @@ public class appRun {
             //starting the reader thread
             jobThread.start();
             //initializing the ready thread
-            ready = new readyJob(jobQueue, readyQueue, syscall, jobThread);
+            ready = new readyJob(jobQueue, readyQueue, cancelQueue, syscall, jobThread);
         }
         Thread readyThread = new Thread(ready);
         //starting the ready thread
