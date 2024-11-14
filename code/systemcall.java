@@ -120,13 +120,4 @@ public class systemcall  {
         os.remain(process, burstTook);
         os.switchToUserMode();
 	}
-
-    //returns the amount of memory that is used
-    public int memoryAllocate(){
-        os.switchToKernelMode();
-        int allocate = os.memoryAllocate();
-        os.switchToUserMode();
-        return allocate;
-    }
-
 }
