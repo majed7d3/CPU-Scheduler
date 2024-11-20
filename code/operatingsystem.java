@@ -36,21 +36,31 @@ public class operatingsystem  {
 
     //to allocate an mount of memory, return true if successful ,false otherwise
     public boolean allocate(int memory){
-        if(!bitMod)
+        if(!bitMod){
+            flag[0] = true;
+            turn = 1;
+            while(flag[1] && turn == 1);
             this.memory = this.memory - memory;
-        if(this.memory >= 0)
-            return true;
-        this.memory = this.memory + memory;
+            if(this.memory >= 0)
+                return true;
+            this.memory = this.memory + memory;
+            flag[0] = false;
+        }
         return false;
     }
-
+	
     //to deallocate an mount of memory, return true if successful ,false otherwise
     public boolean deallocate(int memory){
-        if(!bitMod)
+        if(!bitMod){
+            flag[1] = true;
+            turn = 0;
+            while(flag[0] && turn == 0);
             this.memory = this.memory + memory;
-        if(this.memory <= 1024)
-            return true;
-        this.memory = this.memory - memory;
+            if(this.memory <= 1024)
+                return true;
+            this.memory = this.memory - memory;
+            flag[1] = false;
+        }
         return false;
     }
 
