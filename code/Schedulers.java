@@ -30,7 +30,6 @@ public class Schedulers {
 
     //Round Robin, quantum is 8ms
     public void Round_Robin(queue ready){
-        queue waiting = new queue(); //for jobs not finished but the quantum has finished
         int time = 0; //for the time that has been past
         //check if ready queue is not empty of ready thread has not finished 
         while(ready.length() > 0 || readyThread.isAlive()){
@@ -42,8 +41,6 @@ public class Schedulers {
                 PCB job = ready.serve();
                 //set it as running
                 syscall.setState(job,state.running);
-                //deallocate the memory of the job
-                syscall.deallocateMemory(syscall.getMemory(job));
                 //get the remaining time
                 int remain = syscall.getRemain(job);
                 
@@ -61,53 +58,19 @@ public class Schedulers {
 
                 //to check if the jab is finished or not
                 if(syscall.getRemain(job) != 0){
-                    //if not the job will go to the waiting queue
+                    //if not the job will go to the back of the queue
                     syscall.setState(job, state.ready);
-                    waiting.enqueue(job);
+                    ready.enqueue(job);
                 }
                 else{
                     //if it is finished then it will go to the finish queue
+                    //deallocate the memory of the job
+                    syscall.deallocateMemory(syscall.getMemory(job));
                     syscall.setTurnaround(job, time);
                     syscall.setWait(job, time - syscall.getBurst(job));
                     syscall.TerminateProcess(job);
                     finish.enqueue(job);
                 }
-            }
-        }
-
-        //this is the same but to finish the waiting queue
-        while(waiting.length() > 0){
-            //take the job from ready queue
-            PCB job = waiting.serve();
-            //set it as running
-            syscall.setState(job,state.running);
-            //get the remaining time
-            int remain = syscall.getRemain(job);
-            
-            //to see if the remaining is less or equle to 8
-            if(remain <= 8){
-                //finish the job
-                syscall.theRemain(job, remain);
-                time = time + remain;
-            }
-            else{
-                //finish 8ms of the job
-                syscall.theRemain(job, 8);
-                time = time + 8;
-            }
-
-            //to check if the jab is finished or not
-            if(syscall.getRemain(job) != 0){
-                //if not the job will go to the waiting queue
-                syscall.setState(job, state.ready);
-                waiting.enqueue(job);
-            }
-            else{
-                //if it is finished then it will go to the finish queue
-                syscall.setTurnaround(job, time);
-                syscall.setWait(job, time - syscall.getBurst(job));
-                syscall.TerminateProcess(job);
-                finish.enqueue(job);
             }
         }
     }
