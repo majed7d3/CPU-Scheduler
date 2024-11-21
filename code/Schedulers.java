@@ -13,21 +13,29 @@ public class Schedulers {
         this.syscall = syscall;
     }
     
+    // First_Come_First_Serve Algorithm
     public void First_Come_First_Serve(queue ready){
-         int currenttime=0;
-    	queue readyQueue=ready;
-    	
-    	 while(readyQueue.length()>0){
-    		 PCB job= readyQueue.serve();
-    		 job.setState(state.finish);
-    		 job.setWait(currenttime);
-    		 job.setTurnaround(currenttime + job.getBurst());
-    		 currenttime+= job.getBurst();
+         int currenttime=0;// variable to calculate the waiting time 
+         // loop for all jobs in the queue
+    	 while(ready.length()>0){
+    		//take the job from ready queue
+    		 PCB job= ready.serve();
+    		//set it as running
+    		 syscall.setState(job, state.running);
+    		//deallocate the memory of the job
+    		 syscall.deallocateMemory(syscall.getMemory(job));
+    		 //set the wait of the job
+    		 syscall.setWait(job, currenttime);
+    		 //set the setTurnaround of the job
+    		 syscall.setTurnaround(job, currenttime + syscall.getBurst(job));
+    		 // adding the wait time for every job
+    		 currenttime+= syscall.getBurst(job);
+    		 // terminate the procces after its done
+    		 syscall.TerminateProcess(job);
+    		 // put the job in the finish queue
     		 finish.enqueue(job);
     	 }
-
     }
-
     //Round Robin, quantum is 8ms
     public void Round_Robin(queue ready){
         int time = 0; //for the time that has been past
