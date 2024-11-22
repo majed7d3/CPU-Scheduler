@@ -70,5 +70,11 @@ public class appRun {
             i++;
         }
         System.out.println(i);
+        i = 0;
+        while (cancelQueue.length() > 0) {
+            System.out.println("id: "+ cancelQueue.serve().getId());
+            i++;
+        }
+        System.out.println(i);
     }
 }
