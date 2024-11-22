@@ -17,7 +17,7 @@ public class appRun {
         queue cancelQueue = new queue();
         operatingsystem os = new operatingsystem();
         systemcall syscall = new systemcall(os);
-        
+        SchedulerResult result = new SchedulerResult();
         fileReader reader;
         Thread jobThread;
         readyJob ready;
@@ -60,21 +60,6 @@ public class appRun {
                 break;
         }
 
-
-
-        //TO-DO the print of the jobs
-        System.out.println("the app is fin");
-        int i = 0;
-        while (finishQueue.length() > 0) {
-            System.out.println("id: "+ finishQueue.serve().getId());
-            i++;
-        }
-        System.out.println(i);
-        i = 0;
-        while (cancelQueue.length() > 0) {
-            System.out.println("id: "+ cancelQueue.serve().getId());
-            i++;
-        }
-        System.out.println(i);
+           result.displayResults(); 
     }
 }
