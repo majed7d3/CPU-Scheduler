@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 public class Schedulers {
     private final Thread readyThread; //the thread of the ready queue
     private queue finish; //a queue for the finished jobs
