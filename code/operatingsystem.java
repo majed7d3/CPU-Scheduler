@@ -1,9 +1,15 @@
 public class operatingsystem  {
     private boolean bitMod; //false is kernel mode true is user mode
     private int memory; //the memory that is allowed in MB (1024MB)
+    private boolean flag[]; //for sync
+    private int turn; //for the turn on the memory, 0 for allocate and 1 for deallocate
 
     //Constructor
     public operatingsystem(){
+        flag = new boolean[2];
+        flag[0] = false;
+        flag[1] = false;
+        turn = 0;
         memory = 1024;
         bitMod = true;
     }
@@ -48,7 +54,7 @@ public class operatingsystem  {
         }
         return false;
     }
-	
+
     //to deallocate an mount of memory, return true if successful ,false otherwise
     public boolean deallocate(int memory){
         if(!bitMod){
