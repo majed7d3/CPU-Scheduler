@@ -4,23 +4,26 @@ public class readyJob implements Runnable{
     private PQueue priorityJobQueue; //priority job queue from the file
     private queue jobQueue; //job queue from the file
     private queue readyQueue; //the ready queue
+    private queue cancelQueue; //for canceled jobs
     private systemcall syscall; //for calling system calls
     
     //Constructor if the queue is priority
-    public readyJob(PQueue priorityJobQueue,queue readyQueue, systemcall syscall, Thread readerThread){
+    public readyJob(PQueue priorityJobQueue,queue readyQueue, queue cancelQueue,systemcall syscall, Thread readerThread){
         this.readerThread = readerThread;
         isPriority = true;
         this.priorityJobQueue = priorityJobQueue;
         this.readyQueue = readyQueue;
+        this.cancelQueue = cancelQueue;
         this.syscall = syscall;
     }
 
     //Constructor for a queue 
-    public readyJob(queue jobQueue,queue readyQueue, systemcall syscall, Thread readerThread){
+    public readyJob(queue jobQueue,queue readyQueue, queue cancelQueue,systemcall syscall, Thread readerThread){
         this.readerThread = readerThread;
         isPriority = false;
         this.jobQueue = jobQueue;
         this.readyQueue = readyQueue;
+        this.cancelQueue = cancelQueue;
         this.syscall = syscall;
     }
 
