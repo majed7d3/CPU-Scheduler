@@ -6,10 +6,11 @@ public class Schedulers {
     private int startTime;
     private int endTime;
     //Constructor
-    public Schedulers(queue finish, systemcall syscall, Thread readyThread){
+    public Schedulers(queue finish, systemcall syscall, Thread readyThread,SchedulerResult result){
         this.readyThread = readyThread;
         this.finish = finish;
         this.syscall = syscall;
+        this.result = result;
     }
     
     // First_Come_First_Serve Algorithm
