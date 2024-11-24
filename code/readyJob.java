@@ -1,98 +1,94 @@
-public class readyJob implements Runnable{
-    private Thread readerThread; //the thread of the reader queue
-    private boolean isPriority; //to know if the queue is priority or not (true for priority, false for no priority)
-    private PQueue priorityJobQueue; //priority job queue from the file
-    private queue jobQueue; //job queue from the file
-    private queue readyQueue; //the ready queue
-    private queue cancelQueue; //for canceled jobs
-    private systemcall syscall; //for calling system calls
-    
-    //Constructor if the queue is priority
-    public readyJob(PQueue priorityJobQueue,queue readyQueue, queue cancelQueue,systemcall syscall, Thread readerThread){
+public class readyJob implements Runnable {
+    private Thread readerThread; // the thread of the reader queue
+    private boolean isPriority; // true if using PQueue, false for queue
+    private PQueue priorityJobQueue; // priority job queue
+    private queue jobQueue; // job queue
+    private queue readyQueue; // the ready queue
+    private queue cancelQueue; // for canceled jobs
+    private systemcall syscall; // for system calls
+
+    // Constructor for priority queue
+    public readyJob(PQueue priorityJobQueue, queue readyQueue, queue cancelQueue, systemcall syscall, Thread readerThread) {
         this.readerThread = readerThread;
-        isPriority = true;
+        this.isPriority = true;
         this.priorityJobQueue = priorityJobQueue;
         this.readyQueue = readyQueue;
         this.cancelQueue = cancelQueue;
         this.syscall = syscall;
     }
 
-    //Constructor for a queue 
-    public readyJob(queue jobQueue,queue readyQueue, queue cancelQueue,systemcall syscall, Thread readerThread){
+    // Constructor for non-priority queue
+    public readyJob(queue jobQueue, queue readyQueue, queue cancelQueue, systemcall syscall, Thread readerThread) {
         this.readerThread = readerThread;
-        isPriority = false;
+        this.isPriority = false;
         this.jobQueue = jobQueue;
         this.readyQueue = readyQueue;
         this.cancelQueue = cancelQueue;
         this.syscall = syscall;
     }
 
-    //read from job queue and add to ready queue if there is enough memory
-    //if process is bigger then the memory the process will be canceled
     @Override
-    public void run() {
+public void run() {
+    while (readerThread.isAlive() || (isPriority ? priorityJobQueue.length() > 0 : jobQueue.length() > 0)) {
         PCB job = null;
-        if(!isPriority){ //to see if the queue is priority
-            //check if the reader Thread is still up or not
-            //or check if job queue is empty or not
-            //or if the job queue is empty but the last job has not been add it
-            while(readerThread.isAlive() || jobQueue.length() > 0 || (jobQueue.length() == 0 && job != null)){
-                //to wait for the reader thread to start
-                while(jobQueue.length() == 0 && readerThread.isAlive()); 
-                
-                //check if the job queue not empty and there is no old job
-                if( jobQueue.length() != 0 && job == null){
-                    job = jobQueue.serve();
-                }
 
-                //to check if the job is bigger then the memory
-                if(syscall.getMemory(job) > 1024){
-                    //set it as canceled
-                    syscall.setState(job, state.canceled);
-                    //add it to the canceled queue
-                    cancelQueue.enqueue(job);
-                    job = null;
+        if (isPriority) {
+            synchronized (priorityJobQueue) {
+                if (priorityJobQueue.length() > 0) {
+                    job = priorityJobQueue.serve(); // Serve the highest priority job
                 }
-                
-                //check if there is a new/old job and there is space in memory for it
-                if(job != null && syscall.allocateMemory(syscall.getMemory(job))){
-                    syscall.setState(job, state.ready);
-                    readyQueue.enqueue(job);
-                    //to make the job empty
-                    job = null;
+            }
+        } else {
+            synchronized (jobQueue) {
+                if (jobQueue.length() > 0) {
+                    job = jobQueue.serve(); // Serve the next job in FCFS order
                 }
             }
         }
-        //same as the one above but for priority queue
-        else{
-            //check if the reader Thread is still up or not
-            //or check if priority job queue is empty or not
-            //or if the priority job queue is empty but the last job has not been add it
-            while(readerThread.isAlive() || priorityJobQueue.length() > 0 || (priorityJobQueue.length() == 0 && job != null)){
-                //to wait for the reader thread to start
-                while(priorityJobQueue.length() == 0 && readerThread.isAlive()); 
-                //check if the priority job queue not empty and there is no old job
-                if( priorityJobQueue.length() != 0 && job == null){
-                    job = priorityJobQueue.serve();
+
+        if (job != null) {
+            if (syscall.getMemory(job) > 1024) {
+                syscall.setState(job, state.canceled);
+                cancelQueue.enqueue(job);
+            } else {
+                boolean allocated;
+                synchronized (syscall) {
+                    allocated = syscall.allocateMemory(syscall.getMemory(job));
                 }
 
-                //to check if the job is bigger then the memory
-                if(syscall.getMemory(job) > 1024){
-                    //set it as canceled
-                    syscall.setState(job, state.canceled);
-                    //add it to the canceled queue
-                    cancelQueue.enqueue(job);
-                    job = null;
-                }
-
-                //check if there is a new/old job and there is space in memory for it
-                if(job != null && syscall.allocateMemory(syscall.getMemory(job))){
+                if (allocated) {
                     syscall.setState(job, state.ready);
-                    readyQueue.enqueue(job);
-                    job = null;
+                    synchronized (readyQueue) {
+                        readyQueue.enqueue(job); // Add to ready queue
+                    }
+                } else {
+                    if (isPriority) {
+                        synchronized (priorityJobQueue) {
+                            priorityJobQueue.enqueue(job, 0, syscall); // Re-enqueue in priority queue
+                        }
+                    } else {
+                        synchronized (jobQueue) {
+                            jobQueue.enqueue(job); // Re-enqueue in job queue
+                        }
+                    }
+
+                    try {
+                        Thread.sleep(10); // Wait before retrying
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
                 }
+            }
+        } else {
+            try {
+                Thread.sleep(10); // Wait briefly if no jobs are available
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
             }
         }
     }
-    
+}
+
 }
