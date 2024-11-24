@@ -95,28 +95,28 @@ public class systemcall  {
 
     //set state of the process
     public void setState(PCB process, state state){
-		os.switchToKernelMode();
+	os.switchToKernelMode();
         os.setState(process, state);
         os.switchToUserMode();
 	}
 
     //set turnaround time of the process
     public void setTurnaround(PCB process, int turnaround){
-		os.switchToKernelMode();
+	os.switchToKernelMode();
         os.setTurnaround(process, turnaround);
         os.switchToUserMode();
 	}
 
     //set Waiting time of the process
 	public void setWait(PCB process, int wait){
-		os.switchToKernelMode();
+	os.switchToKernelMode();
         os.setWait(process, wait);
         os.switchToUserMode();
 	}
 
     //calculate the remain time for the process
     public void theRemain(PCB process, int burstTook){
-		os.switchToKernelMode();
+	os.switchToKernelMode();
         os.remain(process, burstTook);
         os.switchToUserMode();
 	}
