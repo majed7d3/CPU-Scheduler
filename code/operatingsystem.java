@@ -3,13 +3,10 @@ public class operatingsystem  {
     private int memory; //the memory that is allowed in MB (1024MB)
     private boolean flag[]; //for sync
     private int turn; //for the turn on the memory, 0 for allocate and 1 for deallocate
+    private final Object lock = new Object();
 
     //Constructor
     public operatingsystem(){
-        flag = new boolean[2];
-        flag[0] = false;
-        flag[1] = false;
-        turn = 0;
         memory = 1024;
         bitMod = true;
     }
@@ -41,35 +38,32 @@ public class operatingsystem  {
     }
 
     //to allocate an mount of memory, return true if successful ,false otherwise
-    public boolean allocate(int memory){
-        if(!bitMod){
-            flag[0] = true;
-            turn = 1;
-            while(flag[1] && turn == 1);
-            this.memory = this.memory - memory;
-            if(this.memory >= 0)
-                return true;
-            this.memory = this.memory + memory;
-            flag[0] = false;
+    public boolean allocate(int memory) {
+        synchronized (lock) {
+            while (this.memory < memory) { // Wait only if insufficient memory
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return false; // Exit if interrupted
+                }
+            }
+            // Memory is sufficient, proceed with allocation
+            this.memory -= memory;
+            return true;
         }
-        return false;
     }
-
     //to deallocate an mount of memory, return true if successful ,false otherwise
-    public boolean deallocate(int memory){
-        if(!bitMod){
-            flag[1] = true;
-            turn = 0;
-            while(flag[0] && turn == 0);
-            this.memory = this.memory + memory;
-            if(this.memory <= 1024)
-                return true;
-            this.memory = this.memory - memory;
-            flag[1] = false;
+    public boolean deallocate(int memory) {
+        synchronized (lock) {
+            this.memory += memory;
+            if (this.memory > 1024) { // Cap memory at the maximum
+                this.memory = 1024;
+            }
+            lock.notifyAll(); // Notify all waiting threads
+            return true;
         }
-        return false;
     }
-
     //return the id of a process, -1 otherwise
     public int getId(PCB process){
         if(!bitMod){
