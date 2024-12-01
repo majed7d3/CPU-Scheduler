@@ -28,67 +28,66 @@ public class readyJob implements Runnable {
     }
 
     @Override
-public void run() {
-    while (readerThread.isAlive() || (isPriority ? priorityJobQueue.length() > 0 : jobQueue.length() > 0)) {
-        PCB job = null;
+    public void run() {
+        while (readerThread.isAlive() || (isPriority ? priorityJobQueue.length() > 0 : jobQueue.length() > 0)) {
+            PCB job = null;
 
-        if (isPriority) {
-            synchronized (priorityJobQueue) {
-                if (priorityJobQueue.length() > 0) {
-                    job = priorityJobQueue.serve(); // Serve the highest priority job
-                }
-            }
-        } else {
-            synchronized (jobQueue) {
-                if (jobQueue.length() > 0) {
-                    job = jobQueue.serve(); // Serve the next job in FCFS order
-                }
-            }
-        }
-
-        if (job != null) {
-            if (syscall.getMemory(job) > 1024) {
-                syscall.setState(job, state.canceled);
-                cancelQueue.enqueue(job);
-            } else {
-                boolean allocated;
-                synchronized (syscall) {
-                    allocated = syscall.allocateMemory(syscall.getMemory(job));
-                }
-
-                if (allocated) {
-                    syscall.setState(job, state.ready);
-                    synchronized (readyQueue) {
-                        readyQueue.enqueue(job); // Add to ready queue
+            if (isPriority) { //check if the queue is priority
+                synchronized (priorityJobQueue) {
+                    if (priorityJobQueue.length() > 0) {
+                        job = priorityJobQueue.serve(); // Serve the highest priority job
                     }
+                }
+            } else {
+                synchronized (jobQueue) {
+                    if (jobQueue.length() > 0) {
+                        job = jobQueue.serve(); // Serve the next job in FCFS order
+                    }
+                }
+            }
+
+            if (job != null) { //check if the job is not null
+                if (syscall.getMemory(job) > 1024) { //check if the job is bigger then the memory
+                    syscall.setState(job, state.canceled); //if it is it will be canceled
+                    cancelQueue.enqueue(job);
                 } else {
-                    if (isPriority) {
-                        synchronized (priorityJobQueue) {
-                            priorityJobQueue.enqueue(job, 0, syscall); // Re-enqueue in priority queue
+                    boolean allocated; //for checking if the memory was allocated
+                    synchronized (syscall) { //to allocated the memory
+                        allocated = syscall.allocateMemory(syscall.getMemory(job));
+                    }
+
+                    if (allocated) { //check if the memory was allocated
+                        syscall.setState(job, state.ready);
+                        synchronized (readyQueue) {
+                            readyQueue.enqueue(job); // Add to ready queue
                         }
                     } else {
-                        synchronized (jobQueue) {
-                            jobQueue.enqueue(job); // Re-enqueue in job queue
+                        if (isPriority) { //check if queue is priority
+                            synchronized (priorityJobQueue) {
+                                priorityJobQueue.enqueue(job, 0, syscall); // Re-enqueue in priority queue
+                            }
+                        } else {
+                            synchronized (jobQueue) {
+                                jobQueue.enqueue(job); // Re-enqueue in job queue
+                            }
+                        }
+
+                        try {
+                            Thread.sleep(10); // Wait before retrying
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            break;
                         }
                     }
-
-                    try {
-                        Thread.sleep(10); // Wait before retrying
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        break;
-                    }
                 }
-            }
-        } else {
-            try {
-                Thread.sleep(10); // Wait briefly if no jobs are available
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
+            } else {
+                try {
+                    Thread.sleep(10); // Wait briefly if no jobs are available
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
             }
         }
     }
-}
-
 }
