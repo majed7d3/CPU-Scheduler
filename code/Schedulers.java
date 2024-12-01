@@ -1,21 +1,20 @@
 public class Schedulers {
     private final Thread readyThread; //the thread of the ready queue
-    private queue finish; //a queue for the finished jobs
     private systemcall syscall; //for system calls
     private SchedulerResult result;
     private int startTime;
     private int endTime;
+
     //Constructor
-    public Schedulers(queue finish, systemcall syscall, Thread readyThread,SchedulerResult result){
+    public Schedulers(systemcall syscall, Thread readyThread,SchedulerResult result){
         this.readyThread = readyThread;
-        this.finish = finish;
         this.syscall = syscall;
         this.result = result;
     }
     
-    // First_Come_First_Serve Algorithm
+    //for First_Come_First_Serve Algorithm
     public void First_Come_First_Serve(queue ready) {
-        int currentTime = 0;
+        int currentTime = 0; //the current time
     
         while (ready.length() > 0 || readyThread.isAlive()) {
             // Wait for jobs to be added to the ready queue
@@ -28,19 +27,19 @@ public class Schedulers {
                 }
             }
     
+            //check if ready queue has jobs
             if (ready.length() > 0) {
                 PCB currentProcess = ready.serve();
-                int startTime = currentTime;
+                int startTime = currentTime; //the start time of the job
     
-                syscall.setState(currentProcess, state.running);
-                syscall.deallocateMemory(syscall.getMemory(currentProcess));
-                syscall.setWait(currentProcess, currentTime);
-                currentTime += syscall.getBurst(currentProcess);
-                int endTime = currentTime;
+                syscall.setState(currentProcess, state.running); //running the job
+                syscall.deallocateMemory(syscall.getMemory(currentProcess)); //deallocate the job from the memory
+                syscall.setWait(currentProcess, currentTime); //seting the waiting time 
+                currentTime += syscall.getBurst(currentProcess); //increase the time
+                int endTime = currentTime; //the end time for the job
     
-                syscall.setTurnaround(currentProcess, endTime);
-                syscall.setState(currentProcess, state.finish);
-                finish.enqueue(currentProcess);
+                syscall.setTurnaround(currentProcess, endTime);//seting the turnaround time
+                syscall.TerminateProcess(currentProcess);//Terminateing the job
     
                 // Log the process execution
                 result.addProcessExecution(currentProcess.getId(), startTime, endTime, syscall.getWait(currentProcess), syscall.getTurnaround(currentProcess));
@@ -55,11 +54,11 @@ public class Schedulers {
         }
     }
 
-    
+    //for Round_Robin
     public void Round_Robin(queue ready) {
         int time = 0; // Tracks the total time passed
-        startTime = 0;
-        endTime = 0;
+        startTime = 0; //start time for the job
+        endTime = 0; //end time for the job
     
         // Continue while jobs are in the ready queue or the ready thread is alive
         while (ready.length() > 0 || readyThread.isAlive()) {
@@ -93,7 +92,6 @@ public class Schedulers {
                     syscall.setTurnaround(job, time);
                     syscall.setWait(job, time - syscall.getBurst(job));
                     syscall.TerminateProcess(job);
-                    finish.enqueue(job); // Add to the finished queue
     
                     // Log the completed process
                     result.addProcessExecution(job.getId(), startTime, endTime, syscall.getWait(job), syscall.getTurnaround(job));
@@ -122,6 +120,7 @@ public class Schedulers {
         }
     }
     
+    //for Shortest_Job_First
     public void Shortest_Job_First(queue ready) {
         int currentTime = 0; //tracking the current time
     
@@ -143,8 +142,7 @@ public class Schedulers {
                 currentTime += syscall.getBurst(currentProcess); //Simulate the process execution
                 int endTime = currentTime; //save the end time of the current process
                 syscall.setTurnaround(currentProcess, endTime);//Set the turnaround time for the process
-                syscall.setState(currentProcess, state.finish); //Set the process state to 'finish'
-                finish.enqueue(currentProcess);//Add the completed process to the finish queue
+                syscall.TerminateProcess(currentProcess); //Set the process state to 'finish'
                 result.addProcessExecution(currentProcess.getId(), startTime, endTime, syscall.getWait(currentProcess), syscall.getTurnaround(currentProcess)); //send the execution details to the printing class
             } 
             }
