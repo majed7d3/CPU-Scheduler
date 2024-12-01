@@ -1,9 +1,7 @@
 public class operatingsystem  {
     private boolean bitMod; //false is kernel mode true is user mode
     private int memory; //the memory that is allowed in MB (1024MB)
-    private boolean flag[]; //for sync
-    private int turn; //for the turn on the memory, 0 for allocate and 1 for deallocate
-    private final Object lock = new Object();
+    private final Object lock = new Object(); //for synchronizing
 
     //Constructor
     public operatingsystem(){
@@ -53,6 +51,7 @@ public class operatingsystem  {
             return true;
         }
     }
+    
     //to deallocate an mount of memory, return true if successful ,false otherwise
     public boolean deallocate(int memory) {
         synchronized (lock) {
@@ -64,6 +63,7 @@ public class operatingsystem  {
             return true;
         }
     }
+
     //return the id of a process, -1 otherwise
     public int getId(PCB process){
         if(!bitMod){
